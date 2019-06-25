@@ -1,0 +1,177 @@
+//Jamie Doherty
+//Eclipse WorkSpace 2019-06 -  Java Language
+package gameOfLifeContent;
+//Import java.util* for use of all. Scanner included. 
+import java.util.*;
+
+public class GameOfLife {
+
+	//Setting grid size for console to print.
+	int length=100;
+	int height =20; 
+	
+	public static void main(String[] args)
+	{
+		//Creating an object for the GOL therefore "instantiating" a class.
+		GameOfLife GOL= new GameOfLife();  // no-argument constructor.
+		GOL.initGame(); //Initialise Game intiGame() Method with created object.
+		
+	}
+	
+	public void initGame() {
+		//2Dimensional Array for the GRID. As it is 2D and not 1D. Height and length not just length. Many lines.
+		char[][] board = new char[height][length]; 
+
+		//Initialise variable below in order to use in within method. Goes to this method and returns the percentage I have set.
+		double percentage =0; 
+		percentage=configBoard(board);
+		
+		//Display the board through calling the method with the board as a parameter.
+		displayALL(board);	
+		System.out.println("Current Board Above");
+		//Simple Scanner Output and Input from User. Interactivity. 
+		System.out.println("Are you ready to begin Game Of Life? y/n");
+		Scanner input = new Scanner(System.in);
+		String response = input.nextLine();	
+		
+		//While loop to START GAME
+		while(response.toLowerCase().equals("y")) {
+			System.out.println("Next Generation:");	
+			board=generate(board,height, length); 
+			displayALL(board);
+			
+			System.out.println("X to stop!");
+			//To stop the game if user wants to terminate the game.
+//			String stop = input.nextLine(); //This isnt the correct way to cancel...caused issues.
+//			if(stop.toLowerCase().equals("x")) {
+//				System.out.println("You have stopped."); 
+				
+				
+//			}
+			//Used to slow down the game. 2 seconds through every iteration.
+			try
+			{
+				Thread.sleep(2000); //2 seconds...So we can view it as good time!
+			}
+			catch(Exception e)
+			{
+				System.out.println("There has been an exception error. Pleae restart");
+			}
+			
+			
+		}
+		
+		//If statements below to return to beginning of initGame() if n or other has been chosen.
+		if(response.toLowerCase().equals("n")) {
+			System.out.println("");
+			initGame();
+		}
+		if(!response.toLowerCase().equals("n") && !response.toLowerCase().equals("y")) {
+			System.out.println("Please select valid response.");	
+			initGame();
+		}
+		input.close(); //Closes the scanner to stop more input.
+		
+	}
+	
+	//New generation iteration. 
+	/* This is the generate method with parameters of board, length and height.
+	 * the board is char so we can use the _, * and 0, 1 characters. I used int at the
+	 * start and then realised that it needed to be char to be less complicated!
+	 * */
+	public char[][] generate(char[][] board,int length, int height)
+	{
+		//new array initialised with variables within method parameters (that have been initialised above).
+		char[][] newboard=new char[length][height];
+		
+		//iteration count in length below
+		for(int i=0;i<length;i++)
+			//iteration count in height below
+			for(int j=0;j<height;j++)
+				//new array based off i and j iterations going into instructions method.
+				newboard[i][j]=instructions(board,i,j);
+		
+		return newboard;
+		
+	}
+	
+	public char instructions(char[][] board, int i, int j)
+	{
+		/*These are the instructions used for the next generations. The count
+		 * below counts the neighbours to the cell and then applied the rules
+		 * through the if states i have stated below. */
+	int count= neighbours(board,i,j);
+	if(board[i][j]=='*')
+		{
+		if(count<2||count>3||count==0) {
+			return '_'; 
+		}
+	return '*';
+	}
+		
+	else
+		{
+		if(count==3 || count==2) 
+		{
+			return '*'; 
+		}
+	return '_';		
+		}
+	}
+	
+	//Counting the neighbours method for the cell using the parameters being used previously.
+	public int neighbours(char[][] board, int i, int j) {
+		int count=0; //Initialise variable
+		for(int x=i-1;x<=i+1;x++) {  //checking the height cells
+			for(int y=j-1;y<=j+1;y++) //checking the length cells
+			{
+				if(x==i&&y==j)
+					continue;
+				count+=eval(board,x,y); //count + eval(board,x,y) = eval(board,x,y)
+			}
+		}
+		return count;
+		
+	}
+	
+	public int eval(char[][] board, int i, int j)
+	{
+		if(i<0||j<0||i==height||j==length) {
+			return 0; }  //integers returned
+		if(board[i][j]=='*') { 
+			return 1; } //integers
+		return 0;
+	}
+	
+	double configBoard(char[][] disArray) {
+		double percentage = 0.05; //percentage of the grid i want to fill
+		for(int i=0; i<disArray.length; i++) {
+			setRandom(disArray[i],percentage); //set random filled cells.
+		}
+		return percentage;
+	}
+	
+	public void setRandom(char[] disArray, double percentage) {
+		for(int i=0; i<disArray.length;i++)
+		{
+			if(Math.random()<percentage) 
+				disArray[i]='*';
+			else
+				disArray[i]='_'; 
+		}
+	}
+
+	public void displayALL(char[][] disArray) { //2DIMENSAIONAL
+		for (int i=0; i<disArray.length; i++)
+			display1D(disArray[i]);
+			System.out.println(); //Display 2D
+	}
+	void display1D(char[] disArray) //1DIMESNIONAL ARRAY
+	{
+		for(int i=0;i<disArray.length;i++)
+			System.out.print(disArray[i]);
+		System.out.println();   //Display 1D 
+	}
+	
+	
+}
